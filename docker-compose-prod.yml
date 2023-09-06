@@ -1,0 +1,52 @@
+version: "3.9"
+services:
+  client-prod:
+    image: react-app-prod
+    container_name: client-prod
+    build:
+      context: client/
+      target: prod
+      dockerfile: Dockerfile
+    stdin_open: true
+    ports:
+      - "8080:80"
+    networks:
+      - mern-app-front
+    tty: true
+
+  server-prod:
+    image: api-server-prod
+    container_name: server-prod
+    build:
+      context: server/
+      target: prod
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"      
+    environment:
+      - MONGO=mongo-prod
+    depends_on:
+      - mongo-prod
+    networks:
+      - mern-app-back
+      - mern-app-front
+    tty: true
+
+  mongo-prod:
+    image: mongodb/mongodb-community-server:7.0.0-ubi8
+    ports:
+      - "27017:27017"
+    networks:
+      - mern-app-back
+    volumes:
+      - mongo-data-prod:/data/db
+
+networks: 
+  mern-app-front:
+    driver: bridge
+  mern-app-back:
+    driver: bridge
+
+volumes:
+  mongo-data-prod:
+    driver: local

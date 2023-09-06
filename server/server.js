@@ -8,7 +8,7 @@ app.use(cors());
 app.use(bodyparser.json());
 app.use(express.json())
 
-mongoose.connect("mongodb://mongo:27017/dockerconfirmed")
+mongoose.connect(`mongodb://${process.env.MONGO}:27017/dockerconfirmed`)
   .then(() => {
   console.log('Connecté à MongoDB');
   })

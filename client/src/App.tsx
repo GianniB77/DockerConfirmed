@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios';
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
 
   return (
     <div>
-      <h1>Contenu du tableau</h1>
+      <h1>Les animes que j'ai vu :</h1>
       <ul>
         
         {data.map((item: any) => (
