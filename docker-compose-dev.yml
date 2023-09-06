@@ -1,53 +1,59 @@
 version: "3.9"
+
+# Définit les services (conteneurs) pour votre application
 services:
+  # Service pour l'application client (React)
   client:
     image: react-app
     container_name: client
     build:
-      context: client/
-      target: dev
-      dockerfile: Dockerfile
-    stdin_open: true
+      context: client/         # Le chemin vers le dossier de construction de l'application client
+      target: dev              # La cible spécifique du Dockerfile
+      dockerfile: Dockerfile   # Le nom du fichier Dockerfile à utiliser
+    stdin_open: true           # Ouvre une connexion interactive pour l'entrée standard
     ports:
-      - "5173:5173"
+      - "5173:5173"            # Fait correspondre le port 5173 du conteneur au port 5173 de l'hôte
     networks:
-      - mern-app
+      - mern-app               # Associe le service au réseau "mern-app"
     volumes:
-      - ./client:/develop
-    tty: true
+      - ./client:/develop      # Montre le répertoire local de l'application client dans le conteneur
+    tty: true                  # Active le mode pseudo-TTY pour l'interaction
 
+  # Service pour le serveur API
   server:
     image: api-server
     container_name: server
     build:
-      context: server/
-      target: dev
-      dockerfile: Dockerfile
+      context: server/         # Le chemin vers le dossier de construction du serveur API
+      target: dev              # La cible spécifique du Dockerfile
+      dockerfile: Dockerfile   # Le nom du fichier Dockerfile à utiliser
     ports:
-      - "5000:5000"
+      - "5000:5000"            # Fait correspondre le port 5000 du conteneur au port 5000 de l'hôte
     environment:
-      - MONGO=mongo
+      - MONGO=mongo            # Configuration de l'environnement pour le serveur API
     depends_on:
-      - mongo
+      - mongo                  # Attend que le service "mongo" soit opérationnel
     networks:
-      - mern-app
-    tty: true
+      - mern-app               # Associe le service au réseau "mern-app"
+    tty: true                  # Active le mode pseudo-TTY pour l'interaction
     volumes:
-      - ./server:/develop
+      - ./server:/develop      # Montre le répertoire local du serveur API dans le conteneur
 
+  # Service pour MongoDB
   mongo:
     image: mongodb/mongodb-community-server:7.0.0-ubi8
     ports:
-      - "27017:27017"
+      - "27017:27017"           # Fait correspondre le port 27017 du conteneur au port 27017 de l'hôte
     networks:
-      - mern-app
+      - mern-app                # Associe le service au réseau "mern-app"
     volumes:
-      - mongo-data:/data/db
+      - mongo-data:/data/db     # Montre le volume pour stocker les données MongoDB
 
-networks: 
+# Définit le réseau pour les services
+networks:
   mern-app:
     driver: bridge
 
+# Définit les volumes pour stocker les données persistantes
 volumes:
   mongo-data:
-    driver: local

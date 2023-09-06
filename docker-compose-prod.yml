@@ -1,52 +1,59 @@
 version: "3.9"
+
+# Définit les services (conteneurs) pour votre application en production
 services:
+  # Service pour l'application client en production (React)
   client-prod:
     image: react-app-prod
     container_name: client-prod
     build:
-      context: client/
-      target: prod
-      dockerfile: Dockerfile
-    stdin_open: true
+      context: client/          # Le chemin vers le dossier de construction de l'application client
+      target: prod             # La cible spécifique du Dockerfile
+      dockerfile: Dockerfile   # Le nom du fichier Dockerfile à utiliser
+    stdin_open: true           # Ouvre une connexion interactive pour l'entrée standard
     ports:
-      - "8080:80"
+      - "8080:80"              # Fait correspondre le port 8080 du conteneur au port 80 de l'hôte
     networks:
-      - mern-app-front
-    tty: true
+      - mern-app-front         # Associe le service au réseau "mern-app-front"
+    tty: true                  # Active le mode pseudo-TTY pour l'interaction
 
+  # Service pour le serveur API en production
   server-prod:
     image: api-server-prod
     container_name: server-prod
     build:
-      context: server/
-      target: prod
-      dockerfile: Dockerfile
+      context: server/          # Le chemin vers le dossier de construction du serveur API
+      target: prod              # La cible spécifique du Dockerfile
+      dockerfile: Dockerfile    # Le nom du fichier Dockerfile à utiliser
     ports:
-      - "5000:5000"      
+      - "5000:5000"             # Fait correspondre le port 5000 du conteneur au port 5000 de l'hôte
     environment:
-      - MONGO=mongo-prod
+      - MONGO=mongo-prod        # Configuration de l'environnement pour le serveur API en production
     depends_on:
-      - mongo-prod
+      - mongo-prod              # Attend que le service "mongo-prod" soit opérationnel
     networks:
-      - mern-app-back
-      - mern-app-front
-    tty: true
+      - mern-app-back           # Associe le service au réseau "mern-app-back"
+      - mern-app-front          # Associe également le service au réseau "mern-app-front"
+    tty: true                  # Active le mode pseudo-TTY pour l'interaction
 
+  # Service pour MongoDB en production
   mongo-prod:
     image: mongodb/mongodb-community-server:7.0.0-ubi8
     ports:
-      - "27017:27017"
+      - "27017:27017"           # Fait correspondre le port 27017 du conteneur au port 27017 de l'hôte
     networks:
-      - mern-app-back
+      - mern-app-back           # Associe le service au réseau "mern-app-back"
     volumes:
-      - mongo-data-prod:/data/db
+      - mongo-data-prod:/data/db # Montre le volume pour stocker les données MongoDB en production
 
+# Définit les réseaux pour les services en production
 networks: 
   mern-app-front:
-    driver: bridge
+    driver: bridge             # Utilise le pilote de réseau "bridge" pour le réseau "mern-app-front"
   mern-app-back:
-    driver: bridge
+    driver: bridge             # Utilise le pilote de réseau "bridge" pour le réseau "mern-app-back"
 
+# Définit les volumes pour stocker les données persistantes en production
 volumes:
   mongo-data-prod:
-    driver: local
+    driver: local              # Utilise le pilote de volume "local" pour le volume "mongo-data-prod"
