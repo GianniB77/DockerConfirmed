@@ -1,0 +1,51 @@
+version: "3.9"
+services:
+  client:
+    image: react-app
+    container_name: client
+    build:
+      context: client/
+      target: dev
+      dockerfile: Dockerfile
+    stdin_open: true
+    ports:
+      - "5173:5173"
+    networks:
+      - mern-app
+    volumes:
+      - ./client:/develop
+    tty: true
+
+  server:
+    image: api-server
+    container_name: server
+    build:
+      context: server/
+      target: dev
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    networks:
+      - mern-app
+    tty: true
+    volumes:
+      - ./server:/develop
+
+  mongo:
+    image: mongodb/mongodb-community-server:7.0.0-ubi8
+    ports:
+      - "27017:27017"
+    networks:
+      - mern-app
+    volumes:
+      - mongo-data:/data/db
+
+networks: 
+  mern-app:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
